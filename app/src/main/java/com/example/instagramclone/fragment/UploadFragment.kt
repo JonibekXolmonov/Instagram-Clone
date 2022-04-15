@@ -92,7 +92,6 @@ class UploadFragment : BaseFragment() {
     }
 
     private fun uploadNewPost() {
-        listener!!.scrollToHome()
         val caption = binding.edtCaption.text.toString().trim()
         if (caption.isNotEmpty() && pickedPhoto != null) {
             uploadPostPhoto(caption, pickedPhoto!!)
@@ -140,7 +139,7 @@ class UploadFragment : BaseFragment() {
             override fun onSuccess(post: Post) {
                 dismissLoading()
                 resetAll()
-               // listener!!.scrollToHome()
+                listener!!.scrollToHome()
             }
 
             override fun onError(e: Exception) {

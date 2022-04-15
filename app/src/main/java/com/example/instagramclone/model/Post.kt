@@ -19,11 +19,15 @@ class Post {
         this.postImage = postImage
     }
 
-    constructor(id: String, caption: String, postImage: String) {
+
+    constructor(id: String, caption: String, postImage: String, currentDate: String) {
         this.id = id
         this.caption = caption
         this.postImage = postImage
+        this.currentDate = currentDate
     }
+
+    constructor()
 
 
     private fun currentTime(): String {

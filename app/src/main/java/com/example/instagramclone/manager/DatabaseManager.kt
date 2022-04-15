@@ -7,6 +7,7 @@ import com.example.instagramclone.manager.handler.DBUsersHandler
 import com.example.instagramclone.model.Post
 import com.example.instagramclone.model.User
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 private var USER_PATH = "users"
 private var POST_PATH = "posts"
@@ -16,7 +17,7 @@ private var FOLLOWERS_PATH = "followers"
 
 object DatabaseManager {
 
-    private var database = FirebaseFirestore.getInstance()
+    private var database:FirebaseFirestore = FirebaseFirestore.getInstance()
 
     fun storeUser(user: User, handler: DBUserHandler) {
         database.collection(USER_PATH).document(user.uid).set(user)
@@ -89,6 +90,7 @@ object DatabaseManager {
 
     fun loadPosts(uid: String, handler: DBPostsHandler) {
         val reference = database.collection(USER_PATH).document(uid).collection(POST_PATH)
+            .orderBy("currentDate", Query.Direction.DESCENDING)
         reference.get().addOnCompleteListener {
             val posts = ArrayList<Post>()
             if (it.isSuccessful) {
@@ -96,10 +98,11 @@ object DatabaseManager {
                     val id = document.getString("id")
                     val caption = document.getString("caption")
                     val postImg = document.getString("postImage")
+                    val currentDate = document.getString("currentDate")
                     val fullname = document.getString("fullname")
                     val userImg = document.getString("userImg")
 
-                    val post = Post(id!!, caption!!, postImg!!)
+                    val post = Post(id!!, caption!!, postImg!!,currentDate!!)
                     post.uid = uid
                     post.fullname = fullname!!
                     post.userImg = userImg!!
@@ -112,8 +115,9 @@ object DatabaseManager {
         }
     }
 
-    fun loadFeeds(uid: String, handler: DBPostsHandler){
+    fun loadFeeds(uid: String, handler: DBPostsHandler) {
         val reference = database.collection(USER_PATH).document(uid).collection(FEED_PATH)
+            .orderBy("currentTime", Query.Direction.DESCENDING)
         reference.get().addOnCompleteListener {
             val posts = ArrayList<Post>()
             if (it.isSuccessful) {
@@ -121,10 +125,11 @@ object DatabaseManager {
                     val id = document.getString("id")
                     val caption = document.getString("caption")
                     val postImg = document.getString("postImg")
+                    val currentDate = document.getString("currentDate")
                     val fullname = document.getString("fullname")
                     val userImg = document.getString("userImg")
 
-                    val post = Post(id!!, caption!!, postImg!!)
+                    val post = Post(id!!, caption!!, postImg!!,currentDate!!)
                     post.uid = uid
                     post.fullname = fullname!!
                     post.userImg = userImg!!

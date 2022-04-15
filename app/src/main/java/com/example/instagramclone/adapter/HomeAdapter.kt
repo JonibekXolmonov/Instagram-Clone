@@ -1,9 +1,14 @@
 package com.example.instagramclone.adapter
 
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.instagramclone.databinding.ItemPostHomeBinding
 import com.example.instagramclone.model.Post
 
@@ -22,6 +27,7 @@ class HomeAdapter(var items: ArrayList<Post>) : BaseAdapter() {
         val post = items[position]
         if (holder is PostViewHolder) {
             holder.itemPostHomeBinding.tvCaption.text = post.caption
+            holder.itemPostHomeBinding.tvTime.text = post.currentDate
             Glide.with(holder.itemPostHomeBinding.ivPost)
                 .load(post.postImage)
                 .into(holder.itemPostHomeBinding.ivPost)
