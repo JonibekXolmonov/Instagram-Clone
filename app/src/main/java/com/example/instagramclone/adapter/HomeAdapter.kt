@@ -21,8 +21,9 @@ class HomeAdapter(var items: ArrayList<Post>) : BaseAdapter() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val post = items[position]
         if (holder is PostViewHolder) {
+            holder.itemPostHomeBinding.tvCaption.text = post.caption
             Glide.with(holder.itemPostHomeBinding.ivPost)
-                .load(post.image)
+                .load(post.postImage)
                 .into(holder.itemPostHomeBinding.ivPost)
         }
     }

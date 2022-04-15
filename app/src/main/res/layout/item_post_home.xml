@@ -98,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
-            android:text="Glide is an Image Loader Library for Android developed by bumptech and is a library that is recommended by Google. It provides animated GIF support and handles image loading/caching."
+            android:text=""
             android:textColor="@color/black"
             android:textSize="16sp" />
     </LinearLayout>

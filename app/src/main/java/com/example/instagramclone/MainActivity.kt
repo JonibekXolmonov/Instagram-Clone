@@ -33,8 +33,8 @@ class MainActivity : BaseActivity(), UploadFragment.UploadListener, HomeFragment
     }
 
     override fun scrollToHome() {
-        index = 0
-        scrollByIndex(index)
+//        index = 0
+//        scrollByIndex(index)
     }
 
     private fun scrollByIndex(index: Int) {

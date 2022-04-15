@@ -29,8 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="2"
-            android:text="Hi, I am looking for someone who has playstore account. I have developed my apps and looking to upload on play console. I don't have play console, hence I am looking for someone who can upload my app on their account." />
+            android:text="" />
     </LinearLayout>
-
 
 </LinearLayout>
