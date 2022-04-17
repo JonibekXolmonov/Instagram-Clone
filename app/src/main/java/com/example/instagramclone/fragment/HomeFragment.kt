@@ -76,7 +76,7 @@ class HomeFragment : BaseFragment() {
     private fun loadMyFeeds() {
         showLoading(requireActivity())
         val uid = AuthManager.currentUser()!!.uid
-        DatabaseManager.loadPosts(uid, object : DBPostsHandler {
+        DatabaseManager.loadFeeds(uid, object : DBPostsHandler {
             override fun onSuccess(posts: ArrayList<Post>) {
                 dismissLoading()
                 Log.d("TAG", "onSuccess: $posts")
