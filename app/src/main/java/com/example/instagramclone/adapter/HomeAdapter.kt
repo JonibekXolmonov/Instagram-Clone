@@ -26,11 +26,18 @@ class HomeAdapter(var items: ArrayList<Post>) : BaseAdapter() {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val post = items[position]
         if (holder is PostViewHolder) {
-            holder.itemPostHomeBinding.tvCaption.text = post.caption
-            holder.itemPostHomeBinding.tvTime.text = post.currentDate
-            Glide.with(holder.itemPostHomeBinding.ivPost)
-                .load(post.postImage)
-                .into(holder.itemPostHomeBinding.ivPost)
+            holder.itemPostHomeBinding.apply {
+                tvCaption.text = post.caption
+                tvTime.text = post.currentDate
+                tvFullname.text = post.fullname
+                Glide.with(ivProfile)
+                    .load(post.userImg)
+                    .into(ivProfile)
+
+                Glide.with(ivPost)
+                    .load(post.postImage)
+                    .into(ivPost)
+            }
         }
     }
 

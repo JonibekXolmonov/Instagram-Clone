@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 private const val OVERSCROLL_TRANSLATION_MAGNITUDE = 0.5f
 
-private const val FLING_TRANSLATION_MAGNITUDE = 0.5f
+private const val FLING_TRANSLATION_MAGNITUDE = 0.7f
 
 class BounceEdgeEffectFactory : RecyclerView.EdgeEffectFactory() {
 

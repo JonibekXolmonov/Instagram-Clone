@@ -22,6 +22,7 @@ import com.example.instagramclone.manager.DatabaseManager
 import com.example.instagramclone.manager.StorageManager
 import com.example.instagramclone.manager.handler.DBPostsHandler
 import com.example.instagramclone.manager.handler.DBUserHandler
+import com.example.instagramclone.manager.handler.DBUsersHandler
 import com.example.instagramclone.manager.handler.StorageHandler
 import com.example.instagramclone.model.Post
 import com.example.instagramclone.model.User
@@ -51,6 +52,28 @@ class ProfileFragment : BaseFragment() {
         initViews()
     }
 
+    private fun loadFollowing() {
+        val uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.loadFollowing(uid, object : DBUsersHandler {
+            override fun onSuccess(users: ArrayList<User>) {
+                binding.tvFollowing.text = users.size.toString()
+            }
+
+            override fun onError(e: Exception) {}
+        })
+    }
+
+    private fun loadMyFollowers() {
+        val uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.loadFollowers(uid, object : DBUsersHandler {
+            override fun onSuccess(users: ArrayList<User>) {
+                binding.tvFollowers.text = users.size.toString()
+            }
+
+            override fun onError(e: Exception) {}
+        })
+    }
+
     private fun initViews() {
         binding.apply {
             ivLogout.setOnClickListener {
@@ -67,6 +90,9 @@ class ProfileFragment : BaseFragment() {
 
         loadUserInfo()
         loadMyPosts()
+
+        loadFollowing()
+        loadMyFollowers()
     }
 
     private fun loadMyPosts() {

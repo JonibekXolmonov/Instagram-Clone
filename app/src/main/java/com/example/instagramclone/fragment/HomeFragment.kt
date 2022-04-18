@@ -17,6 +17,7 @@ import com.example.instagramclone.manager.DatabaseManager
 import com.example.instagramclone.manager.handler.DBPostsHandler
 import com.example.instagramclone.model.Post
 import com.example.instagramclone.utils.BounceEdgeEffectFactory
+import com.example.instagramclone.utils.Extensions.toast
 import java.lang.Exception
 import java.lang.RuntimeException
 
@@ -26,6 +27,7 @@ class HomeFragment : BaseFragment() {
     private val binding by viewBinding { FragmentHomeBinding.bind(it) }
     var listener: HomeListener? = null
     lateinit var adapter: HomeAdapter
+    var feeds = ArrayList<Post>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +40,12 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initView()
+    }
+
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        if (isVisibleToUser && feeds.size > 0) {
+            loadMyFeeds()
+        }
     }
 
     /*
@@ -79,12 +87,13 @@ class HomeFragment : BaseFragment() {
         DatabaseManager.loadFeeds(uid, object : DBPostsHandler {
             override fun onSuccess(posts: ArrayList<Post>) {
                 dismissLoading()
-                Log.d("TAG", "onSuccess: $posts")
+                feeds.clear()
+                feeds.addAll(posts)
                 refreshAdapter(posts)
             }
 
             override fun onError(e: Exception) {
-
+                dismissLoading()
             }
         })
     }

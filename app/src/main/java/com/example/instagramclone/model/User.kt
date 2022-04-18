@@ -6,6 +6,7 @@ class User {
     var email: String = ""
     var password: String = ""
     var userImg: String = ""
+    var isFollowed: Boolean = false
 
     constructor(fullname: String, email: String) {
         this.fullname = fullname
