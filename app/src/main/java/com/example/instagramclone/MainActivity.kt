@@ -1,10 +1,13 @@
 package com.example.instagramclone
 
 import android.os.Bundle
+import android.util.Log
 import androidx.viewpager.widget.ViewPager
 import com.example.instagramclone.adapter.ViewPagerAdapter
 import com.example.instagramclone.databinding.ActivityMainBinding
 import com.example.instagramclone.fragment.*
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 
 /*
 MainActivity contains view pager with 5 fragments
@@ -88,6 +91,18 @@ class MainActivity : BaseActivity(), UploadFragment.UploadListener, HomeFragment
         homeFragment = HomeFragment()
         uploadFragment = UploadFragment()
         setupViewPager(binding.viewPager)
+
+        sendGroupNotification()
+    }
+
+    private fun sendGroupNotification() {
+        Firebase.messaging.subscribeToTopic("user").addOnCompleteListener {
+            Log.e(TAG, "sendGroupNotification: ${it.isSuccessful}")
+        }
+
+        Firebase.messaging.subscribeToTopic("all").addOnCompleteListener {
+            Log.e(TAG, "sendGroupNotification: ${it.isSuccessful}")
+        }
     }
 
     private fun setupViewPager(viewPager: ViewPager) {

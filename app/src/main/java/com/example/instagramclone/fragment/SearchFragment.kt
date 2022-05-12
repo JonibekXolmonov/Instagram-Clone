@@ -19,7 +19,12 @@ import com.example.instagramclone.manager.DatabaseManager
 import com.example.instagramclone.manager.handler.DBFollowHandler
 import com.example.instagramclone.manager.handler.DBUserHandler
 import com.example.instagramclone.manager.handler.DBUsersHandler
-import com.example.instagramclone.model.User
+import com.example.instagramclone.model.*
+import com.example.instagramclone.networking.ApiClient
+import com.example.instagramclone.networking.ApiService
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.lang.Exception
 
 
@@ -28,6 +33,14 @@ class SearchFragment : BaseFragment() {
     private val binding by viewBinding { FragmentSearchBinding.bind(it) }
     var items = ArrayList<User>()
     var users = ArrayList<User>()
+
+    private lateinit var apiService: ApiService
+    private var token = ArrayList<String>()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        apiService = ApiClient.createService(ApiService::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -109,7 +122,11 @@ class SearchFragment : BaseFragment() {
         })
     }
 
-    private fun mergedUsers(uid: String, users: ArrayList<User>, following: ArrayList<User>): ArrayList<User> {
+    private fun mergedUsers(
+        uid: String,
+        users: ArrayList<User>,
+        following: ArrayList<User>
+    ): ArrayList<User> {
         val items = ArrayList<User>()
         for (u in users) {
             val user = u
@@ -141,6 +158,11 @@ class SearchFragment : BaseFragment() {
                 DatabaseManager.unFollowUser(me!!, to, object : DBFollowHandler {
                     override fun onSuccess(isDone: Boolean) {
                         to.isFollowed = false
+                        if (to.deviceTokens.size != 0) {
+                            val data = Data("unfollow")
+                            sendUnFollowNotification(to.deviceTokens, me.fullname, data)
+                        }
+
                         DatabaseManager.removePostsToMyFeed(uid, to)
                     }
 
@@ -158,6 +180,11 @@ class SearchFragment : BaseFragment() {
                 DatabaseManager.followUser(me!!, to, object : DBFollowHandler {
                     override fun onSuccess(isDone: Boolean) {
                         to.isFollowed = true
+                        if (to.deviceTokens.size != 0) {
+                            val data = Data("follow")
+                            sendFollowNotification(to.deviceTokens, me.fullname, data)
+                        }
+
                         DatabaseManager.storePostsToMyFeed(uid, to)
                     }
 
@@ -168,4 +195,46 @@ class SearchFragment : BaseFragment() {
             override fun onError(e: Exception) {}
         })
     }
+
+    private fun sendFollowNotification(token: ArrayList<String>, user: String, data: Data) {
+        apiService.sendNotification(
+            FirebaseRequest(
+                Notification("$user is following now", "Instagram clone"), token, data
+            )
+        )
+            .enqueue(object : Callback<FirebaseResponse> {
+                override fun onResponse(
+                    call: Call<FirebaseResponse>,
+                    response: Response<FirebaseResponse>,
+                ) {
+                    Log.d("response", response.body().toString())
+                }
+
+                override fun onFailure(call: Call<FirebaseResponse>, t: Throwable) {
+                    Log.d("failure", t.localizedMessage)
+                }
+            })
+    }
+
+    private fun sendUnFollowNotification(token: ArrayList<String>, user: String, data: Data) {
+        apiService.sendNotification(
+            FirebaseRequest(
+                Notification(" $user is unfollowing you", "Instagram clone"), token, data
+            )
+        ).enqueue(object : Callback<FirebaseResponse> {
+            override fun onResponse(
+                call: Call<FirebaseResponse>,
+                response: Response<FirebaseResponse>,
+            ) {
+                Log.d("response", response.body().toString())
+            }
+
+            override fun onFailure(call: Call<FirebaseResponse>, t: Throwable) {
+                Log.d("failure", t.localizedMessage)
+            }
+
+        })
+    }
+
+
 }

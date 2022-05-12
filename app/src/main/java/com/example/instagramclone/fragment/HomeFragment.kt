@@ -1,10 +1,7 @@
 package com.example.instagramclone.fragment
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +14,6 @@ import com.example.instagramclone.manager.DatabaseManager
 import com.example.instagramclone.manager.handler.DBPostsHandler
 import com.example.instagramclone.model.Post
 import com.example.instagramclone.utils.BounceEdgeEffectFactory
-import com.example.instagramclone.utils.Extensions.toast
 import java.lang.Exception
 import java.lang.RuntimeException
 
@@ -39,7 +35,7 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        initView()
+        initView(view)
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
@@ -69,13 +65,18 @@ class HomeFragment : BaseFragment() {
         listener = null
     }
 
-    private fun initView() {
+    private fun initView(view: View) {
         binding.apply {
             ivCamera.setOnClickListener {
                 listener!!.scrollToUpload()
             }
 
             rvHome.edgeEffectFactory = BounceEdgeEffectFactory()
+
+            adapter = HomeAdapter(this@HomeFragment, arrayListOf())
+            adapter.onMoreClick = { imageUrl ->
+                //delete here
+            }
         }
 
         loadMyFeeds()
@@ -99,8 +100,13 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun refreshAdapter(posts: ArrayList<Post>) {
-        adapter = HomeAdapter(posts)
+        adapter = HomeAdapter(this, posts)
         binding.rvHome.adapter = adapter
+    }
+
+    fun likeOrUnlikePost(post: Post) {
+        val uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.likeFeedPost(uid, post)
     }
 
 

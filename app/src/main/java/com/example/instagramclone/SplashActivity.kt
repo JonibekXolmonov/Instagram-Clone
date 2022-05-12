@@ -8,10 +8,14 @@ import android.os.CountDownTimer
 import android.view.WindowManager
 import com.example.instagramclone.databinding.ActivitySplashBinding
 import com.example.instagramclone.manager.AuthManager
+import com.example.instagramclone.manager.PrefsManager
+import com.example.instagramclone.utils.Logger
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.messaging.FirebaseMessaging
 
 class SplashActivity : BaseActivity() {
 
-   private val TAG = SplashActivity::class.java.simpleName
+    private val TAG = SplashActivity::class.java.simpleName
     lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +33,7 @@ class SplashActivity : BaseActivity() {
 
     private fun initViews() {
         countDownTimer()
+        loadFCMToken()
     }
 
     private fun countDownTimer() {
@@ -36,12 +41,26 @@ class SplashActivity : BaseActivity() {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                if (AuthManager.isSignedIn()){
+                if (AuthManager.isSignedIn()) {
                     callMainActivity(this@SplashActivity)
-                }else{
+                } else {
                     callSignInActivity(this@SplashActivity)
                 }
             }
         }.start()
+    }
+
+    private fun loadFCMToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Logger.d(TAG, "Fetching FCM registration token failed")
+                return@OnCompleteListener
+            }
+            // Get new FCM registration token
+            // Save it in locally to use later
+            val token = task.result
+            Logger.d(TAG, token.toString())
+            PrefsManager(this).storeDeviceToken(token.toString())
+        })
     }
 }

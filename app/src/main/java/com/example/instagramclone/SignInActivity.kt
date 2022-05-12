@@ -5,6 +5,10 @@ import android.os.Bundle
 import com.example.instagramclone.databinding.ActivitySignInBinding
 import com.example.instagramclone.manager.handler.AuthHandler
 import com.example.instagramclone.manager.AuthManager
+import com.example.instagramclone.manager.DatabaseManager
+import com.example.instagramclone.manager.PrefsManager
+import com.example.instagramclone.manager.handler.DBUserHandler
+import com.example.instagramclone.model.User
 import com.example.instagramclone.utils.Extensions.toast
 import java.lang.Exception
 
@@ -32,7 +36,7 @@ class SignInActivity : BaseActivity() {
                         email = edtEmail.text.toString(),
                         password = edtPassword.text.toString()
                     )
-                }else{
+                } else {
                     toast(getString(R.string.str_signin_empty))
                 }
             }
@@ -49,13 +53,28 @@ class SignInActivity : BaseActivity() {
             override fun onSuccess(uid: String) {
                 dismissLoading()
                 toast(getString(R.string.str_signin_success))
-                callMainActivity(context!!)
+                storeDeviceTokenToUser()
             }
 
             override fun onError(exception: Exception?) {
                 dismissLoading()
                 toast(getString(R.string.str_signin_failed))
             }
+        })
+    }
+
+    private fun storeDeviceTokenToUser() {
+        val deviceToken = PrefsManager(this).loadDeviceToken()
+        var uid = AuthManager.currentUser()!!.uid
+        DatabaseManager.addMyDeviceToken(uid, deviceToken, object : DBUserHandler {
+            override fun onSuccess(user: User?) {
+                callMainActivity(context!!)
+            }
+
+            override fun onError(e: Exception) {
+                callMainActivity(context!!)
+            }
+
         })
     }
 

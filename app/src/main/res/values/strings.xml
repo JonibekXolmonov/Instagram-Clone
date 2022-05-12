@@ -28,4 +28,10 @@
     <string name="str_signup_failed">Sign up failed</string>
     <string name="str_signin_empty">Fill all fields</string>
     <string name="str_signup_empty">Fill all fields</string>
+    <string name="str_delete_post">Delete post</string>
+    <string name="str_your_post_is_deleted_forever">Your post is deleted forever</string>
+    <string name="str_share_image">Share image</string>
+    <string name="str_copy_link">Copy link</string>
+    <string name="str_download_image">Download image</string>
+    <string name="str_options">Options</string>
 </resources>

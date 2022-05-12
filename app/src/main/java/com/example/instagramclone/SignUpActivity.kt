@@ -5,6 +5,7 @@ import com.example.instagramclone.databinding.ActivitySignUpBinding
 import com.example.instagramclone.manager.handler.AuthHandler
 import com.example.instagramclone.manager.AuthManager
 import com.example.instagramclone.manager.DatabaseManager
+import com.example.instagramclone.manager.PrefsManager
 import com.example.instagramclone.manager.handler.DBUserHandler
 import com.example.instagramclone.model.User
 import com.example.instagramclone.utils.Extensions.toast
@@ -32,9 +33,11 @@ class SignUpActivity : BaseActivity() {
                 val fullname = edtFullname.text.toString()
                 val email = edtEmail.text.toString()
                 val password = edtPassword.text.toString()
+                val deviceToken = PrefsManager(this@SignUpActivity).loadDeviceToken()!!
 
                 if (email.isNotEmpty() && password.isNotEmpty()) {
                     val user = User(fullname, email, password, "")
+                    user.deviceTokens.add(deviceToken)
                     firebaseSignUp(user)
                 } else {
                     toast(getString(R.string.str_signup_empty))

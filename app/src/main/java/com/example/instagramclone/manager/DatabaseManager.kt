@@ -3,9 +3,11 @@ package com.example.instagramclone.manager
 import com.example.instagramclone.manager.handler.*
 import com.example.instagramclone.model.Post
 import com.example.instagramclone.model.User
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import java.lang.Exception
+import java.sql.Array
 
 private var USER_PATH = "users"
 private var POST_PATH = "posts"
@@ -34,8 +36,12 @@ object DatabaseManager {
                     val fullname = it.getString("fullname")
                     val email = it.getString("email")
                     val userImg = it.getString("userImg")
+                    var device_tokens: ArrayList<String>? =
+                        it.get("deviceTokens") as ArrayList<String>?
 
                     val user = User(fullname!!, email!!, userImg!!)
+                    if (device_tokens == null) device_tokens = ArrayList()
+                    user.deviceTokens = device_tokens
                     user.uid = uid
                     handler.onSuccess(user)
                 } else {
@@ -57,8 +63,14 @@ object DatabaseManager {
                     val fullname = document.getString("fullname")
                     val email = document.getString("email")
                     val userImg = document.getString("userImg")
+                    var device_tokens: ArrayList<String>? =
+                        document.get("deviceTokens") as ArrayList<String>?
+                    if (device_tokens == null) {
+                        device_tokens = ArrayList()
+                    }
 
                     val user = User(fullname!!, email!!, userImg!!)
+                    user.deviceTokens = device_tokens
                     user.uid = uid!!
                     users.add(user)
                 }
@@ -126,9 +138,12 @@ object DatabaseManager {
                     val currentDate = document.getString("currentDate")
                     val fullname = document.getString("fullname")
                     val userImg = document.getString("userImg")
+                    var isLiked = document.getBoolean("isLiked")
+                    if (isLiked == null) isLiked = false
 
                     val post = Post(id!!, caption!!, postImg!!, currentDate!!)
                     post.uid = uid
+                    post.isLiked = isLiked
                     post.fullname = fullname!!
                     post.userImg = userImg!!
                     posts.add(post)
@@ -258,5 +273,70 @@ object DatabaseManager {
     private fun storeFeed(uid: String, post: Post) {
         val reference = database.collection(USER_PATH).document(uid).collection(FEED_PATH)
         reference.document(post.id).set(post)
+    }
+
+    fun likeFeedPost(uid: String, post: Post) {
+        database.collection(USER_PATH).document(uid).collection(FEED_PATH).document(post.id)
+            .update("isLiked", post.isLiked)
+        if (uid == post.uid)
+            database.collection(USER_PATH).document(uid).collection(POST_PATH).document(post.id)
+                .update("isLiked", post.isLiked)
+    }
+
+    fun loadLikedFeeds(uid: String, handler: DBPostsHandler) {
+        val reference = database.collection(USER_PATH).document(uid).collection(FEED_PATH)
+            .whereEqualTo("isLiked", true)
+        reference.get().addOnCompleteListener {
+            val posts = ArrayList<Post>()
+            if (it.isSuccessful) {
+                for (document in it.result!!) {
+                    val id = document.getString("id")
+                    val caption = document.getString("caption")
+                    val postImg = document.getString("postImage")
+                    val fullname = document.getString("fullname")
+                    val userImg = document.getString("userImg")
+                    val currentDate = document.getString("currentDate")
+                    var isLiked = document.getBoolean("isLiked")
+                    if (isLiked == null) isLiked = false
+                    val userId = document.getString("uid")
+
+                    val post = Post(id!!, caption!!, postImg!!, currentDate!!)
+                    post.uid = userId!!
+                    post.fullname = fullname!!
+                    post.userImg = userImg!!
+                    post.currentDate = currentDate
+                    post.isLiked = isLiked
+                    posts.add(post)
+                }
+                handler.onSuccess(posts)
+            } else {
+                handler.onError(it.exception!!)
+            }
+        }
+    }
+
+    fun deletePost(post: Post, handler: DBPostHandler) {
+        val reference1 = database.collection(USER_PATH).document(post.uid).collection(POST_PATH)
+        reference1.document(post.id).delete().addOnSuccessListener {
+
+            val reference2 = database.collection(USER_PATH).document(post.uid).collection(FEED_PATH)
+            reference2.document(post.id).delete().addOnSuccessListener {
+                handler.onSuccess(post)
+            }.addOnFailureListener {
+                handler.onError(it)
+            }
+
+        }.addOnFailureListener {
+            handler.onError(it)
+        }
+    }
+
+    fun addMyDeviceToken(uid: String, deviceToken: String?, handler: DBUserHandler) {
+        val reference = database.collection(USER_PATH).document(uid)
+        reference.update("deviceTokens", FieldValue.arrayUnion(deviceToken)).addOnSuccessListener {
+            handler.onSuccess(null)
+        }.addOnFailureListener {
+            handler.onError(it)
+        }
     }
 }
