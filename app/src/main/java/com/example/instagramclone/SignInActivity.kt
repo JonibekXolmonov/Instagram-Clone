@@ -6,14 +6,16 @@ import com.example.instagramclone.databinding.ActivitySignInBinding
 import com.example.instagramclone.manager.handler.AuthHandler
 import com.example.instagramclone.manager.AuthManager
 import com.example.instagramclone.manager.DatabaseManager
+import com.example.instagramclone.manager.FirebaseConfig
 import com.example.instagramclone.manager.PrefsManager
 import com.example.instagramclone.manager.handler.DBUserHandler
 import com.example.instagramclone.model.User
+import com.example.instagramclone.utils.DeepLink
 import com.example.instagramclone.utils.Extensions.toast
 import java.lang.Exception
 
 /*
-In SignInActivity, user cal login using email, password
+In SignInActivity, user call login using email, password
  */
 class SignInActivity : BaseActivity() {
 
@@ -31,19 +33,23 @@ class SignInActivity : BaseActivity() {
 
         binding.apply {
             btnSignIn.setOnClickListener {
-                if (edtEmail.text.isNotEmpty() && edtPassword.text.isNotEmpty()) {
-                    firebaseSignIn(
-                        email = edtEmail.text.toString(),
-                        password = edtPassword.text.toString()
-                    )
-                } else {
-                    toast(getString(R.string.str_signin_empty))
-                }
+//                if (edtEmail.text.isNotEmpty() && edtPassword.text.isNotEmpty()) {
+//                    firebaseSignIn(
+//                        email = edtEmail.text.toString(),
+//                        password = edtPassword.text.toString()
+//                    )
+//                } else {
+//                    toast(getString(R.string.str_signin_empty))
+//                }
+                FirebaseConfig(llBackground, tvWelcome).updateConfig()
             }
 
             tvSignUp.setOnClickListener {
                 callSignUpActivity()
             }
+
+            FirebaseConfig(llBackground, tvWelcome).applyConfig()
+//            DeepLink.retrieveLink(intent, tvLink)
         }
     }
 
@@ -81,5 +87,19 @@ class SignInActivity : BaseActivity() {
     private fun callSignUpActivity() {
         val intent = Intent(this, SignUpActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun reverse(string: String): String {
+        val chars = string.toCharArray()
+        var l = 0
+        var h = string.length - 1
+        while (l < h) {
+            val c = chars[l]
+            chars[l] = chars[h]
+            chars[h] = c
+            l++
+            h--
+        }
+        return String(chars)
     }
 }

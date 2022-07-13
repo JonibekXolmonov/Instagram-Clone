@@ -36,6 +36,7 @@ class HomeFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initView(view)
+//        throw RuntimeException("Test")
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
